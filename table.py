@@ -1,3 +1,7 @@
+import os
+import sqlite3
+
+
 class Table:
         
     def __init__(self):
@@ -16,11 +20,11 @@ class Table:
     def add_to_table(self, exam_name, s):
         self.process_ans_insert_into_table(exam_name, s)
       
-    def insert_in_table(self, tup):
-        print("()", tup)
-        self.table.executemany('INSERT INTO EXAM VALUES (?, ?, ?)', tup)
+    def insert_into_table(self, rows):
+        print("()", rows)
+        self.table.executemany('INSERT INTO EXAM VALUES (?, ?, ?)', rows)
         self.conn.commit()
-        
+
     def all_word1(self, exam_name):
         self.table.execute('SELECT DISTINCT WORD1 FROM EXAM WHERE EXAM_NAME = ?', (exam_name,))
         list_tup = self.table.fetchall()
@@ -38,8 +42,7 @@ class Table:
         return list_word2   
     
     def show_table(self):
-        update.message.reply_text("Secret funtion!:") 
-        self.table.execute('SELECT EXAM_NAME, WORD1, WORD2 FROM EXAM')   
+        self.table.execute('SELECT EXAM_NAME, WORD1, WORD2 FROM EXAM')
         list_tup = self.table.fetchall()
         list_ans = list()
         for elem in list_tup:
@@ -76,8 +79,8 @@ class Table:
         s = s.replace(',', '')
         s = s.replace(';', '')
         list_elem = list(s.split())
-        list_word1 = list()
-        list_word2 = list()
+        list_word1 = []
+        list_word2 = []
         flag_for_word2 = False
         for el in list_elem:
             if (el == "-"): flag_for_word2 = True
