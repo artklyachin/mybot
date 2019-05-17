@@ -429,11 +429,11 @@ def parametrs_for_updater():
 def main():
     global T
     updater = parametrs_for_updater()
-    T.insert_into_table([("exam1", "car", "автомобиль")])
-    T.insert_into_table([("exam1", "table", "стол")])
-    T.insert_into_table([("exam1", "glass", "стакан")])
-    T.insert_into_table([("exam1", "glass", "cтекло")])
-    T.insert_into_table([("exam2", "word", "слово")])
+    #T.insert_into_table([("exam1", "car", "автомобиль")])
+    #T.insert_into_table([("exam1", "table", "стол")])
+    #T.insert_into_table([("exam1", "glass", "стакан")])
+    #T.insert_into_table([("exam1", "glass", "cтекло")])
+    #T.insert_into_table([("exam2", "word", "слово")])
     updater.start_polling()
     updater.idle() 
 
