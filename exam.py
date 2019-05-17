@@ -7,6 +7,7 @@ class Exam:
     _client_ans = []
     _question_index = None
     _exam_name = None
+    _finish = None
 
     def __init__(self, words, exam_name, num_questions):
         self._num_questions = num_questions
@@ -24,6 +25,7 @@ class Exam:
             self._words[word1].add(word2)
 
     def startExam(self):
+        self._finish = False
         for i in range(self._num_questions):
             self._exam_questions.append(random.choice(list(self._words.keys())))
         self._question_index = 0
@@ -41,6 +43,7 @@ class Exam:
             return self.getQuestion()
         
     def getResult(self):
+        self._finish = True
         ans = ""
         for i in range(self._question_index):
             word1 = self._exam_questions[i]
@@ -58,6 +61,9 @@ class Exam:
     def repeat_exam(self):
         return self.starting_exam()
 
+    def getWord(self):
+        if (not self._finish):
+            return self._exam_questions[self._question_index]
 
     def getName(self):
         return self._exam_name

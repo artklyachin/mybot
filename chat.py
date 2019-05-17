@@ -1,4 +1,4 @@
-import exam, create, train
+import exam, create, train, delete, add
 
 _chats = {}
 
@@ -11,6 +11,8 @@ class Chat:
     _exams = {}
     _created_exam = None
     _trained_exam = None
+    _delete_in_exam = None
+    _add_to_exam = None
 
     _current_exam = None
 
@@ -60,7 +62,31 @@ class Chat:
 
     def create_exam(self, exam_name):
         self._status = "create"
-        self.created_exam = create.Create(exam_name)
+        self._created_exam = create.Create(exam_name)
+
+    def delete_in_exam(self, exam_name):
+        self._status = "delete"
+        self._delete_in_exam = delete.Delete(exam_name)
+
+    def add_to_exam(self, exam_name):
+        self._status = "add"
+        self._add_to_exam = add.Add(exam_name)
+
+    def actions(self):
+        ans = ""
+        if (not self._created_exam is None):
+            ans += "You create an exam: \n" + self._created_exam.getName() + "\n"
+        if (not self._delete_in_exam is None):
+            ans += "You delete words from: \n" + self._delete_in_exam.getName() + "\n"
+        if (not self._trained_exam is None):
+            ans += "You train the: \n" + self._trained_exam.getName() + "\n"
+        if (not self._add_to_exam is None):
+            ans += "You add words to : \n" + self._add_to_exam.getName() + "\n"
+        if (len(self._exams) != 0):
+            ans += "You will be exchanged for: \n"
+            for elem in self._exams:
+                ans += self._exams[elem].getName() + "\n"
+        return ans
 
     def end(self):
         if (self._status == "exam"):
@@ -70,6 +96,10 @@ class Chat:
             self._trained_exam = None
         elif (self._status == "create"):
             self._created_exam = None
+        elif (self._status == "delete"):
+            self._created_exam = None
+        elif (self._status == "add"):
+            self._add_to_exam = None
         self._status = "none"
 
 

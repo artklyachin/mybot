@@ -1,6 +1,6 @@
 import random
 
-class Create:
+class Add:
     _exam_name = None
     _words = []
 

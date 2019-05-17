@@ -1,13 +1,14 @@
 import random
 
-class Create:
+class Delete:
     _exam_name = None
     _words = []
 
     def __init__(self, exam_name):
         self._exam_name = exam_name
 
-    def parse_and_add(self, s):
+    def parse_and_delete(self, s):
+
         index_separator = 0
         if (s.find(" : ") != -1):
             index_separator = s.find(" : ")

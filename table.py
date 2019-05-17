@@ -5,8 +5,8 @@ import sqlite3
 class Table:
         
     def __init__(self):
-        if os.path.isfile('school2.db'):
-            os.remove('school2.db')    
+        #if os.path.isfile('school2.db'):
+        #    os.remove('school2.db')
         self.conn = sqlite3.connect('school2.db', check_same_thread=False)
         self.table = self.conn.cursor()         
         self.table.execute('''
@@ -54,10 +54,20 @@ class Table:
         num = self.table.fetchall()[0][0]
         return (num > 0)
     
-    def existence_check_exam_name(self, exam_name):
+    def exists(self, exam_name):
         self.table.execute('SELECT COUNT(*) FROM EXAM WHERE EXAM_NAME = ?', (exam_name,))  
         num = self.table.fetchall()[0][0]
-        return (num > 0)        
+        return (num > 0)
+
+    def check_entry_into_the_exam(self, s):
+        for elem in s:
+            if(not self.compare_with_the_correct_answer(elem[0], elem[1], elem[2])):
+                return elem
+        return None
+
+    def remove_from_table(self, s):
+        self.table.executemany('DELETE FROM EXAM WHERE EXAM_NAME = ? AND WORD1 = ? AND WORD2 = ?', s)
+        self.conn.commit()
     
     def list_exams(self):
         self.table.execute('SELECT DISTINCT EXAM_NAME FROM EXAM')   
@@ -68,24 +78,9 @@ class Table:
         return list_exams 
         
     def list_words(self, exam_name):           
-        self.table.execute('SELECT WORD1, WORD2 FROM EXAM WHERE EXAM_NAME = ?', (exam_name,))   
+        self.table.execute('SELECT WORD1, WORD2 FROM EXAM WHERE EXAM_NAME = ? ORDER BY WORD1, WORD2', (exam_name,))
         list_tup = self.table.fetchall()
         list_word1_ans_word2 = list()
         for elem in list_tup:
             list_word1_ans_word2.append([elem[0], elem[1]])
-        return list_word1_ans_word2        
-
-    def process_ans_insert_into_table(self, exam_name, s):
-        s = s.replace(',', '')
-        s = s.replace(';', '')
-        list_elem = list(s.split())
-        list_word1 = []
-        list_word2 = []
-        flag_for_word2 = False
-        for el in list_elem:
-            if (el == "-"): flag_for_word2 = True
-            elif (not flag_for_word2): list_word1.append(el)
-            else: list_word2.append(el)
-        for word1 in list_word1:
-            for word2 in list_word2:
-                self.insert_in_table((exam_name, word1, word2))        
+        return list_word1_ans_word2
