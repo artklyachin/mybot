@@ -411,6 +411,7 @@ def parametrs_for_updater():
     dispatcher.add_handler(CommandHandler('add_to_exam', add_to_exam))
     dispatcher.add_handler(CommandHandler('continue_add_to_exam', continue_add_to_exam))
 
+
     #dispatcher.add_handler(CommandHandler('add_in_exam', add_in_exam))
 
     dispatcher.add_handler(CommandHandler('actions', actions))
