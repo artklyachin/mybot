@@ -68,6 +68,10 @@ class Table:
     def remove_from_table(self, s):
         self.table.executemany('DELETE FROM EXAM WHERE EXAM_NAME = ? AND WORD1 = ? AND WORD2 = ?', s)
         self.conn.commit()
+
+    def remove_exam(self, exam_name):
+        self.table.execute('DELETE FROM EXAM WHERE EXAM_NAME = ?', (exam_name, ))
+        self.conn.commit()
     
     def list_exams(self):
         self.table.execute('SELECT DISTINCT EXAM_NAME FROM EXAM')   

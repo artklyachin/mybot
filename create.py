@@ -10,11 +10,12 @@ class Create:
     def parse_and_add(self, s):
         index_separator = 0
         if (s.find(" : ") != -1):
-            index_separator = s.find(" : ")
-        else:
             index_separator = s.find(":")
+        else:
+            index_separator = s.find(" : ")
         s1 = s[:(index_separator + 1)]
         s2 = s[(index_separator + 2):]
+        print(s1, "==", s2)
         list_elem_word1 = list(s1.split(","))
         list_elem_word2 = list(s2.split(","))
         list_word1 = []

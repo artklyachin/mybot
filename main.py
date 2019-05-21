@@ -92,6 +92,15 @@ def train_exam(bot, update):
     if (not T.exists(exam_name)):
         update.message.reply_text("exam " + exam_name + " does not exist")
         return
+    if ((not ch._delete_in_exam is None) and ch._delete_in_exam.getName() == exam_name):
+        update.message.reply_text("you remove words from this exam")
+        return
+    if ((not ch._created_exam is None) and ch._created_exam.getName() == exam_name):
+        update.message.reply_text("exam " + exam_name + " does not exist")
+        return
+    if ((not ch._add_to_exam is None) and ch._add_to_exam.getName() == exam_name):
+        update.message.reply_text("you add words to this exam")
+        return
     if ch.status == "train":
         end()
     response = ch.train_exam(exam_name, T.list_words(exam_name))
@@ -143,6 +152,15 @@ def exam(bot, update):
         return
     if (not T.exists(exam_name)):
         update.message.reply_text("exam " + exam_name + " does not exist")
+        return
+    if ((not ch._delete_in_exam is None) and ch._delete_in_exam.getName() == exam_name):
+        update.message.reply_text("you remove words from this exam")
+        return
+    if ((not ch._created_exam is None) and ch._created_exam.getName() == exam_name):
+        update.message.reply_text("exam " + exam_name + " does not exist")
+        return
+    if ((not ch._add_to_exam is None) and ch._add_to_exam.getName() == exam_name):
+        update.message.reply_text("you add words to this exam")
         return
     response = ch.exam(exam_name, T.list_words(exam_name))
     update.message.reply_text(response)
@@ -204,6 +222,22 @@ def add_to_exam(bot, update):
     if (not T.exists(exam_name)):
         update.message.reply_text("exam " + exam_name + " does not exist")
         return
+    if ((not ch._delete_in_exam is None) and ch._delete_in_exam.getName() == exam_name):
+        update.message.reply_text("you remove words from this exam")
+        return
+    if ((not ch._created_exam is None) and ch._created_exam.getName() == exam_name):
+        update.message.reply_text("exam " + exam_name + " does not exist")
+        return
+    if ((not ch._trained_exam is None) and ch._trained_exam.getName() == exam_name):
+        update.message.reply_text("You train on this exam.")
+        return
+    flag_in_exam = False
+    for elem in ch._exam:
+        if (elem.getName() == exam_name):
+            flag_in_exam = True
+    if (flag_in_exam):
+        update.message.reply_text("You are exam on this exam.")
+        return
     if ch.status == "add":
         end()
     ate = ch.add_to_exam(exam_name)
@@ -232,6 +266,25 @@ def delete_in_exam(bot, update):
     if (not T.exists(exam_name)):
         update.message.reply_text("exam " + exam_name + " does not exist")
         return
+    if ((not ch._created_exam is None) and ch._created_exam.getName() == exam_name):
+        update.message.reply_text("exam " + exam_name + " does not exist")
+        return
+    if ((not ch._trained_exam is None) and ch._trained_exam.getName() == exam_name):
+        update.message.reply_text("You train on this exam.")
+        return
+    if ((not ch._add_to_exam is None) and ch._add_to_exam.getName() == exam_name):
+        update.message.reply_text("you add words to this exam")
+        return
+    if ((not ch._delete_in_exam is None) and ch._delete_in_exam.getName() == exam_name):
+        update.message.reply_text("you remove words from this exam")
+        return
+    flag_in_exam = False
+    for elem in ch._exams:
+        if (elem.getName() == exam_name):
+            flag_in_exam = True
+    if (flag_in_exam):
+        update.message.reply_text("You are exam on this exam.")
+        return
     if ch.status == "delete":
         end()
     die = ch.delete_in_exam(exam_name)
@@ -249,6 +302,36 @@ def continue_delete_in_exam(bot, update):
     ch.status == "delete"
     send_message(bot, update, "you continue to delete from " + die.getName())
     send_message(bot, update, instructions_for_filling_the_dictionary)
+
+
+def delete_exam(bot, update):
+    global T
+    ch = get_chat(update)
+    exam_name = get_text_in_request(update.message.text)
+    if (exam_name == ""):
+        update.message.reply_text("No correct. /delete_exam <name>")
+        return
+    if (not T.exists(exam_name)):
+        update.message.reply_text("exam " + exam_name + " does not exist")
+        return
+    if ((not ch._created_exam is None) and ch._created_exam.getName() == exam_name):
+        update.message.reply_text("exam " + exam_name + " does not exist")
+        return
+    if ((not ch._trained_exam is None) and ch._trained_exam.getName() == exam_name):
+        update.message.reply_text("You train on this exam.")
+        return
+    if ((not ch._add_to_exam is None) and ch._add_to_exam.getName() == exam_name):
+        update.message.reply_text("you add words to this exam")
+        return
+    flag_in_exam = False
+    for elem in ch._exams:
+        if (elem.getName() == exam_name):
+            flag_in_exam = True
+    if (flag_in_exam):
+        update.message.reply_text("You are exam on this exam.")
+        return
+    T.remove_exam(exam_name)
+    send_message(bot, update, "removed " + exam_name)
 
 def show_table(bot, update):
     print("No")
@@ -293,6 +376,7 @@ def help(bot, update):
         - - /continue_add_to_exam
         - /delete_in_exam
         - - /continue_delete_in_exam
+        - /delete_exam
         - /actions
         - /show_table no
         - /list_exams
@@ -411,6 +495,7 @@ def parametrs_for_updater():
     dispatcher.add_handler(CommandHandler('add_to_exam', add_to_exam))
     dispatcher.add_handler(CommandHandler('continue_add_to_exam', continue_add_to_exam))
 
+    dispatcher.add_handler(CommandHandler('delete_exam', delete_exam))
 
     #dispatcher.add_handler(CommandHandler('add_in_exam', add_in_exam))
 
