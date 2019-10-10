@@ -212,6 +212,10 @@ def actions(bot, update):
     else:
         update.message.reply_text(text)
 
+def finish_all_actions(bot, update):
+    ch = get_chat(update)
+    text = ch.finish_all_actions()
+
 def add_to_exam(bot, update):
     global T, instructions_for_filling_the_dictionary
     ch = get_chat(update)
@@ -378,6 +382,7 @@ def help(bot, update):
         - - /continue_delete_in_exam
         - /delete_exam
         - /actions
+        - /finish_all_actions
         - /show_table no
         - /list_exams
         - /list_words
@@ -500,6 +505,8 @@ def parametrs_for_updater():
     #dispatcher.add_handler(CommandHandler('add_in_exam', add_in_exam))
 
     dispatcher.add_handler(CommandHandler('actions', actions))
+    dispatcher.add_handler(CommandHandler('finish_all_actions', finish_all_actions))
+
     dispatcher.add_handler(CommandHandler('show_table', show_table))
     dispatcher.add_handler(CommandHandler('list_exams', list_exams))
     dispatcher.add_handler(CommandHandler('list_words', list_words))

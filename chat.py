@@ -88,6 +88,16 @@ class Chat:
                 ans += self._exams[elem].getName() + "\n"
         return ans
 
+
+    def finish_all_actions(self):
+        self._exams.clear()
+        self._current_exam = None
+        self._trained_exam = None
+        self._created_exam = None
+        self._created_exam = None
+        self._add_to_exam = None
+        self._status = "none"
+
     def end(self):
         if (self._status == "exam"):
             del self._exams[self._current_exam.getName()]
