@@ -6,7 +6,7 @@ import table
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import config, chat, exam, create
 
-instructions_for_filling_the_dictionary = 'Enter words in the format \n word : word, word \n You can add values ​​through comma.'
+instructions_for_filling_the_dictionary = 'Enter words in the format \n word : word, word \n You can add values separated by commas.'
 T = table.Table()
 status = "none"
 
