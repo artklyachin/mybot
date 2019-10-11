@@ -56,6 +56,9 @@ class Exam:
             for word2 in self._words[word1]:
                 ans += word2 + " "
             ans += "\n"
+        if (ans == ""):
+            ans += "no answer"
+        ans += "\n You can /repeat_exam"
         return ans
           
     def repeat_exam(self):
@@ -64,6 +67,7 @@ class Exam:
     def getWord(self):
         if (not self._finish):
             return self._exam_questions[self._question_index]
+        return None
 
     def getName(self):
         return self._exam_name

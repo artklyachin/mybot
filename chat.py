@@ -52,7 +52,6 @@ class Chat:
         self._status = "exam"
         self._current_exam = exam.Exam(words, exam_name, 3)
         self._exams[exam_name] = self._current_exam
-        return self._exams[exam_name].startExam()
 
     def train_exam(self, exam_name, words):
         self._status = "train"
@@ -83,7 +82,7 @@ class Chat:
         if (not self._add_to_exam is None):
             ans += "You add words to : \n" + self._add_to_exam.getName() + "\n"
         if (len(self._exams) != 0):
-            ans += "You will be exchanged for: \n"
+            ans += "You take the exam on: \n"
             for elem in self._exams:
                 ans += self._exams[elem].getName() + "\n"
         return ans
@@ -94,8 +93,8 @@ class Chat:
         self._current_exam = None
         self._trained_exam = None
         self._created_exam = None
-        self._created_exam = None
         self._add_to_exam = None
+        self._delete_in_exam = None
         self._status = "none"
 
     def end(self):
@@ -107,7 +106,7 @@ class Chat:
         elif (self._status == "create"):
             self._created_exam = None
         elif (self._status == "delete"):
-            self._created_exam = None
+            self._delete_in_exam = None
         elif (self._status == "add"):
             self._add_to_exam = None
         self._status = "none"
