@@ -1,22 +1,22 @@
 import random
 
 class Exam:
-    _num_questions = None
+    _num_questions = None #максимальное количество вопросов к клиенту, за один проход экзамена. Обычно равно 3.
     _words = {}
     _exam_questions = []
-    _client_ans = []
-    _question_index = None
+    _client_ans = [] #список ответов клиента при статусе exam
+    _question_index = None #количество ответов клиента на экзамене
     _exam_name = None
-    _finish = None
+    _finish = None #начало экзамена true, конец False
 
     def __init__(self, words, exam_name, num_questions):
         self._num_questions = num_questions
         self._exam_name = exam_name
 
-        _words = {}
+        self._words = {}
         self._exam_questions = []
         self._client_ans = []
-        
+        print("+=+", words)
         for elem in words:
             word1 = elem[0]
             word2 = elem[1]
@@ -25,10 +25,13 @@ class Exam:
             self._words[word1].add(word2)
 
     def startExam(self):
+        print("+")
         self._finish = False
+        self._exam_questions = []
+        self._client_ans = []
+        self._question_index = 0
         for i in range(self._num_questions):
             self._exam_questions.append(random.choice(list(self._words.keys())))
-        self._question_index = 0
         return self.getQuestion()
 
     def getQuestion(self):
@@ -36,13 +39,13 @@ class Exam:
         
     def addAnswer(self, answer):
         self._client_ans.append(answer)
-        self._question_index += 1
+        self._question_index += 1 #количество ответов клиента на экзамене.
         if (self._question_index >= self._num_questions):
-            return self.getResult()
+            return self.getResult() #экзамен закончен. Вывод ответов.
         else:
-            return self.getQuestion()
+            return self.getQuestion() #экзамен не закончен. Задаём экзаминационный вопрос к клиенту.
         
-    def getResult(self):
+    def getResult(self): #Вывод ответов к экзамену.
         self._finish = True
         ans = ""
         for i in range(self._question_index):
@@ -54,11 +57,12 @@ class Exam:
                 ans += "False "
             ans += " your: " + client_answer + "  right: "
             for word2 in self._words[word1]:
-                ans += word2 + " "
+                ans += word2 + " / "
             ans += "\n"
-        if (ans == ""):
+        if (self._question_index == 0):
             ans += "no answer"
         ans += "\n You can /repeat_exam"
+        self._question_index = 0
         return ans
           
     def repeat_exam(self):
@@ -68,6 +72,13 @@ class Exam:
         if (not self._finish):
             return self._exam_questions[self._question_index]
         return None
+
+    #def getWords(self):
+    #    words = []
+    #    for (w in self.w)
+    #    if (not self._finish):
+    #        return self._exam_questions[self._question_index]
+    #    return None
 
     def getName(self):
         return self._exam_name
