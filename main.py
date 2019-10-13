@@ -24,7 +24,6 @@ def send_message(bot, update, text):
 def start(bot, update):
     ch = get_chat(update)
     update.message.reply_text("Hi %s, i'm your bot" % ch.firstName)
-    update.message.reply_text(ch.chatId)
     #update.message.reply_text("firstName: " + ch.firstName)
     #if ch.userName: update.message.reply_text("userName: " + ch.userName)
     #update.message.reply_text(("KKRRHH".rstrip("H")).lstrip("K"))
@@ -60,9 +59,9 @@ def exists(update, exam_name): #проверка того, есть ли наз�
     ch = get_chat(update)
     if (T.exist_in_the_table(exam_name)):
         if (T.exam_owner_id(exam_name) == ch._chatId):
-            update.message.reply_text("You already have an exam with this name.")
+            update.message.reply_text("The action will not be completed. You already have an exam named " + exam_name)
         else:
-            update.message.reply_text("this name is taken by another user")
+            update.message.reply_text("The action will not be completed. The exam name " + exam_name + " is already taken by another user.")
         return True
     return False
 
@@ -122,9 +121,6 @@ def new_exam(bot, update):
     global instructions_for_filling_the_dictionary
     ch = get_chat(update)
     exam_name = get_text_in_request(update.message.text)
-    if (not ch._created_exam is None): #в случае если другой экзамен в процессе создания
-        update.message.reply_text("You can only create one examine. Now you are creating an " + ch._created_exam.getName())
-        return
     if (exam_name == ""): #в случае, если имя экззамена пустое
         update.message.reply_text("No correct. /new_exam <name>")
         return
@@ -252,7 +248,6 @@ def exam(bot, update):
     if (validation_check_2(update, exam_name)):
         return
     '''
-    print(T.list_words(exam_name))
     ch.exam(exam_name, T.list_words(exam_name))
     update.message.reply_text(ch._current_exam.startExam())
 
@@ -443,7 +438,7 @@ def delete_exam(bot, update):
 
 def show_table(bot, update):
     send_message(bot, update, "No.")
-    print("No")
+
 
 def list_exams(bot, update):
     global T
@@ -452,9 +447,9 @@ def list_exams(bot, update):
     send_message(bot, update, "all exam titles:")
     for elem in list_name:
         if (elem[1] == ch._chatId):
-            send_message(bot, update, elem[0] + " - " + str(elem[1]) + " This is your exam")
+            send_message(bot, update, elem[0] + " - This is your exam")
         else:
-            send_message(bot, update, elem[0] + " - " + str(elem[1]))
+            send_message(bot, update, elem[0])
 
 def list_words(bot, update):
     global T
@@ -477,6 +472,28 @@ def list_words(bot, update):
     send_message(bot, update, "all word == word pairs in " + exam_name + ":")
     for elem in list_words:
         send_message(bot, update, elem[0] + " == " + elem[1])
+
+
+def change_name(bot, update):
+    global T
+    ch = get_chat(update)
+    names = list(get_text_in_request(update.message.text).split())
+    if (not ch.status is None):
+        multiple_actions_error_output(update)
+        return
+    if (len(names) < 2 or len(names) > 2):
+        update.message.reply_text("No correct. /change_name <old_name> <new_name>")
+        return
+    if (not T.exist_in_the_table(names[0])):
+        update.message.reply_text("the " + names[0] + " exam does not exist")
+        return
+    if (T.exam_owner_id(names[0]) != ch._chatId):
+        update.message.reply_text("You cannot edit this exam because you are not the creator of it.")
+        return
+    if (exists(update, names[1])): #в случае если такой экзамен уже существует
+        return
+    T.change_name(names[0], names[1])
+    update.message.reply_text("the exam has been renamed from " + names[0] + " to " + names[1])
 
 def help(bot, update): #вывод всех команд
     send_message(bot, update, '''
@@ -504,7 +521,6 @@ def get_message(bot, update): #при получении любой незнак
     client_answer = update.message.text #сообщение от клиента
     if ch.status == "exam": #получаем ответ от клиента. Делаем 1 шаг экзамена.
         ex = ch._current_exam #объект - рассматриваемый экзамен. тип:exam.
-        print(ex._exam_questions)
         if ex is None:
             send_message(bot, update, "Error. You are not in exam")
             send_message(bot, update, "If you want to finish examining, then call the command /end")
@@ -624,6 +640,7 @@ def parametrs_for_updater(): #каждой команде сопоставляе
     dispatcher.add_handler(CommandHandler('list_exams', list_exams))
     dispatcher.add_handler(CommandHandler('list_words', list_words))
     dispatcher.add_handler(CommandHandler('status', status2))
+    #dispatcher.add_handler(CommandHandler('change_name', change_name))
     dispatcher.add_handler(CommandHandler('help', help))
     
     dispatcher.add_error_handler(error)  #функция, вызываемая в случае ошибки
@@ -642,7 +659,7 @@ def main():
     #T.insert_into_table([("exam1", "glass", "cтекло")])
     #T.insert_into_table([("exam2", "word", "слово")])
     updater.start_polling() #внутри цикл, получающий запросы
-    updater.idle() #что-то для окончания работы
+    updater.idle()
 
 main()
 

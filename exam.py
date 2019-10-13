@@ -16,7 +16,6 @@ class Exam:
         self._words = {}
         self._exam_questions = []
         self._client_ans = []
-        print("+=+", words)
         for elem in words:
             word1 = elem[0]
             word2 = elem[1]
@@ -25,7 +24,6 @@ class Exam:
             self._words[word1].add(word2)
 
     def startExam(self):
-        print("+")
         self._finish = False
         self._exam_questions = []
         self._client_ans = []

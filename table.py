@@ -33,7 +33,6 @@ class Table:
         self.conn.commit()
 
     def insert_into_table(self, rows): #добавление в таблицу EXAM
-        print("()", rows)
         self.table.executemany('INSERT INTO EXAM VALUES (?, ?, ?)', rows)
         self.conn.commit()
 
@@ -118,8 +117,7 @@ class Table:
         list_tup = self.table.fetchall()
         for elem in list_tup:
             list_exams.append([elem[1], elem[0]])
-        print(list_exams)
-        return list_exams 
+        return list_exams
         
     def list_words(self, exam_name): #вывод всех word1, word2 для определённого экзамена
         self.table.execute('SELECT WORD1, WORD2 FROM EXAM WHERE EXAM_NAME = ? ORDER BY WORD1, WORD2', (exam_name,))
@@ -128,6 +126,9 @@ class Table:
         for elem in list_tup:
             list_word1_ans_word2.append([elem[0], elem[1]])
         return list_word1_ans_word2
+
+    def change_name(self, old_name, new_name):
+        return
 
     def exam_owner_id(self, exam_name):
         self.table.execute('SELECT OWNER_ID FROM EXAM_OWNER WHERE EXAM_NAME = ?', (exam_name,))

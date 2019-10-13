@@ -53,7 +53,6 @@ class Chat:
 
     def exam(self, exam_name, words):
         self._status = "exam"
-        print("++" + exam_name)
         self._current_exam = exam.Exam(words, exam_name, 3)
         #self._exams[exam_name] = self._current_exam
 
