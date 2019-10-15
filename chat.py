@@ -14,6 +14,7 @@ class Chat:
     _delete_in_exam = None
     _add_to_exam = None
     _current_exam = None  #объект - рассматриваемый экзамен
+    _admin_mode = False
 
     def __init__(self, chatId, firstName, userName):
         self._chatId = chatId

@@ -24,6 +24,7 @@ def send_message(bot, update, text):
 def start(bot, update):
     ch = get_chat(update)
     update.message.reply_text("Hi %s, i'm your bot" % ch.firstName)
+    update.message.reply_text("If this is your first visit to me, you can call the /help command. You will receive tips for using the bot.")
     #update.message.reply_text("firstName: " + ch.firstName)
     #if ch.userName: update.message.reply_text("userName: " + ch.userName)
     #update.message.reply_text(("KKRRHH".rstrip("H")).lstrip("K"))
@@ -65,38 +66,6 @@ def exists(update, exam_name): #проверка того, есть ли наз�
         return True
     return False
 
-'''
-def validation_check_1(update, exam_name):
-    ch = get_chat(update)
-    if (not ch._created_exam is None and ch._created_exam.getName() == exam_name):
-        update.message.reply_text("No action, this exam is being created")
-        return True
-    if (not ch._trained_exam is None and ch._trained_exam.getName() == exam_name):
-        update.message.reply_text("No action, you are training on this exam")
-        return True
-    flag_in_exam = False
-    for elem in ch._exams:
-        if (elem.getName() == exam_name):
-            flag_in_exam = True
-            break
-    if (flag_in_exam):
-        update.message.reply_text("No action, you are examining for this exam")
-    return False
-
-def validation_check_2(update, exam_name):
-    ch = get_chat(update)
-    if (not ch._created_exam is None and ch._created_exam.getName() == exam_name):
-        update.message.reply_text("No action, this exam is being created")
-        return True
-    if (not ch._add_to_exam is None and ch._add_to_exam.getName() == exam_name):
-        update.message.reply_text("No action, now add words to this exam")
-        return True
-    if (not ch._delete_in_exam is None and ch._delete_in_exam.getName() == exam_name):
-        update.message.reply_text("No action, now remove the words from this exam")
-        return True
-    return False
-'''
-
 def multiple_actions_error_output(update):
     ch = get_chat(update)
     if (ch.status == "create"):
@@ -110,7 +79,7 @@ def multiple_actions_error_output(update):
         update.message.reply_text("You cannot do this action because you are being tested. You can end the exam using the /end command")
     elif (ch.status == "delete"):
         die = ch._delete_in_exam
-        update.message.reply_text("You cannot do this action because you are deleting data from exam " + die.getName() + ". You can end the uninstall with the /end command ")
+        update.message.reply_text("You cannot do this action because you are deleting data from exam " + die.getName() + ". You can end the uninstall with the /end command")
     elif (ch.status == "add"):
         ate = ch._add_to_exam
         update.message.reply_text("You cannot do this action because you are adding data to exam " + ate.getName() + ". You can finish adding with the /end command")
@@ -134,33 +103,12 @@ def new_exam(bot, update):
     send_message(bot, update, "You start creating an exam " + exam_name)
     send_message(bot, update, instructions_for_filling_the_dictionary)
 
-#устаревшая функция
-'''
-def continue_create_exam(bot, update):
-    global instructions_for_filling_the_dictionary
-    ch = get_chat(update)
-    exam_name = get_text_in_request(update.message.text)
-    cr = ch._created_exam
-    if (cr.getName() is None):
-        update.message.reply_text("No exams are being created")
-        return
-    if (exam_name != ""):
-        update.message.reply_text("You can continue to create only the " + cr.getName() + ". Correct: /continue_create_exam")
-        return
-    ch.status = "create"
-    send_message(bot, update, "you continue to create " + cr.getName())
-    send_message(bot, update, instructions_for_filling_the_dictionary)
-'''
-
 def train_exam(bot, update):
     global T
     ch = get_chat(update)
     exam_name = get_text_in_request(update.message.text)
     if (not ch.status is None):
         multiple_actions_error_output(update)
-        return
-    if (not ch._trained_exam is None):
-        update.message.reply_text("You can train on only one exam. You are now training on the " + ch._trained_exam.getName())
         return
     if (exam_name == ""):
         update.message.reply_text("No correct. /train_exam <name>")
@@ -174,10 +122,6 @@ def train_exam(bot, update):
     if (not T.exist_in_the_table(exam_name)):
         update.message.reply_text("the " + exam_name + " exam does not exist")
         return
-    '''
-    if (validation_check_2(update, exam_name)):
-        return
-    '''
     ch.train_exam(exam_name, T.list_words(exam_name))
     update.message.reply_text(ch._trained_exam.getNext_word())
     update.message.reply_text("/all_meanings")
@@ -185,7 +129,7 @@ def train_exam(bot, update):
 def next_word(bot, update):
     ch = get_chat(update)
     if (ch.status != "train"):
-        update.message.reply_text("Now do not train on any of the exams.")
+        update.message.reply_text("This command only works in training mode.")
         multiple_actions_error_output(update)
         return
     tr = ch._trained_exam
@@ -195,7 +139,7 @@ def next_word(bot, update):
 def all_meanings(bot, update):
     ch = get_chat(update)
     if (ch.status != "train"):
-        update.message.reply_text("You are not being trained.")
+        update.message.reply_text("This command only works in training mode.")
         multiple_actions_error_output(update)
         return
     tr = ch._trained_exam
@@ -205,25 +149,6 @@ def all_meanings(bot, update):
         ans += elem + " / "
     update.message.reply_text(ans)
     update.message.reply_text("/next_word")
-
-#устаревшая функция
-'''
-def continue_train(bot, update):
-    global T
-    ch = get_chat(update)
-    exam_name = get_text_in_request(update.message.text)
-    tr = ch._trained_exam
-    if (tr.getName() is None):
-        update.message.reply_text("There are no exams you train in")
-        return
-    if (exam_name != ""):
-        update.message.reply_text("You can continue to train only the " + tr.getName() + ". Correct: /continue_train")
-        return
-    ch.status = "train"
-    update.message.reply_text("You continue to train on the " + tr.getName())
-    update.message.reply_text(tr.getNext_word())
-    update.message.reply_text("/all_meanings")
-'''
 
 def exam(bot, update):
     global T
@@ -244,58 +169,43 @@ def exam(bot, update):
     if (not T.exist_in_the_table(exam_name)):
         update.message.reply_text("the " + exam_name + " exam does not exist")
         return
-    '''
-    if (validation_check_2(update, exam_name)):
-        return
-    '''
     ch.exam(exam_name, T.list_words(exam_name))
     update.message.reply_text(ch._current_exam.startExam())
 
 def repeat_exam(bot, update):
     ch = get_chat(update)
-    if (ch._current_exam is None and ch.status != "exam"):
-        update.message.reply_text("The function is available if the current action")
-        return
     ex = ch._current_exam
+    if (ch.status != "exam"):
+        update.message.reply_text("This command only works in exam mode.")
+        multiple_actions_error_output(update)
+        return
+    if (not ex._finish):
+        update.message.reply_text("You cannot use this command because you have not finished the previous test .")
+        update.message.reply_text("If you want to finish the test and find out the results, then call the command /finish.")
+        return
     update.message.reply_text(ex.startExam())
 
 def finish(bot, update):
     ch = get_chat(update)
-    if (ch._current_exam is None and ch.status != "exam"):
-        update.message.reply_text("The function is available if the current action")
+    if (ch.status != "exam"):
+        update.message.reply_text("This command only works in exam mode.")
         multiple_actions_error_output(update)
         return
     ex = ch._current_exam
+    if (ex._finish):
+        update.message.reply_text("You're not taking an exam right now.")
+        update.message.reply_text("If you want to pass another test for the exam " + ex._exam_name + ", then call the command /repeat_exam")
+        return
     text = ex.getResult()
     update.message.reply_text(text)
+    send_message(bot, update, "If you want to exit the exam mode, then call the command /end")
 
-#устаревшая функция
-'''
-def continue_exam(bot, update):
-    global T
-    ch = get_chat(update)
-    exam_name = get_text_in_request(update.message.text)
-    if (exam_name == ""):
-        update.message.reply_text("No correct. /continue_exam <name>")
-        return
-    if (not exam_name in ch._exams):
-        update.message.reply_text("You have not started the exam for this exam.")
-        return
-    ch.status = "exam"
-    ch._current_exam = ch._exams[exam_name]
-    ex = ch._current_exam
-    response = ex.getWord()
-    if (response is None):
-        update.message.reply_text(ex.startExam())
-    else:
-        update.message.reply_text(response)
-'''
-
+#скорее устаревшая функция
 def actions(bot, update):
     ch = get_chat(update)
     text = ch.actions()
     if (text == ""):
-        update.message.reply_text("None action")
+        update.message.reply_text("no action")
     else:
         update.message.reply_text(text)
 
@@ -312,9 +222,6 @@ def add_to_exam(bot, update):
     if (not ch.status is None):
         multiple_actions_error_output(update)
         return
-    if (not ch._add_to_exam is None):
-        update.message.reply_text("You can add words in only one exam. You are now adding words to the " + ch._add_to_exam.getName())
-        return
     if (exam_name == ""):
         update.message.reply_text("No correct. /add_to_exam <name>")
         return
@@ -324,36 +231,12 @@ def add_to_exam(bot, update):
     if (not T.exist_in_the_table(exam_name)):
         update.message.reply_text("Аction cannot be performed. The exam exists, but it is empty.")
         return
-    if (T.exam_owner_id(exam_name) != ch._chatId):
+    if (T.exam_owner_id(exam_name) != ch._chatId and not ch._admin_mode):
         update.message.reply_text("You cannot edit this exam because you are not the creator of it.")
         return
-    '''
-    if (validation_check_1(update, exam_name)):
-        return
-    if (validation_check_2(update, exam_name)):
-        return
-    '''
     ch.add_to_exam(exam_name)
     send_message(bot, update, "You start to add to the " + exam_name)
     send_message(bot, update, instructions_for_filling_the_dictionary)
-
-#устаревшая функция
-'''
-def continue_add_to_exam(bot, update):
-    global instructions_for_filling_the_dictionary
-    ch = get_chat(update)
-    exam_name = get_text_in_request(update.message.text)
-    ate = ch._add_to_exam
-    if (ate.getName() is None):
-        update.message.reply_text("There are no exams where you add words.")
-        return
-    if (exam_name != ""):
-        update.message.reply_text("You can continue to add words only at " + ate.getName() + ". Correct: /continue_add_to_exam")
-        return
-    ch.status = "add"
-    send_message(bot, update, "you continue to add from " + ate.getName())
-    send_message(bot, update, instructions_for_filling_the_dictionary)
-'''
 
 def delete_in_exam(bot, update):
     global T, instructions_for_filling_the_dictionary
@@ -361,9 +244,6 @@ def delete_in_exam(bot, update):
     exam_name = get_text_in_request(update.message.text)
     if (not ch.status is None):
         multiple_actions_error_output(update)
-        return
-    if (not ch._delete_in_exam is None):
-        update.message.reply_text("You can delete words in only one exam. You are now deleting words in the " + ch.delete_in_exam.getName())
         return
     if (exam_name == ""):
         update.message.reply_text("No correct. /delete_in_exam <name>")
@@ -377,36 +257,12 @@ def delete_in_exam(bot, update):
     if (not T.exist_in_the_table(exam_name)):
         update.message.reply_text("the " + exam_name + " exam does not exist")
         return
-    if (T.exam_owner_id(exam_name) != ch._chatId):
+    if (T.exam_owner_id(exam_name) != ch._chatId and not ch._admin_mode):
         update.message.reply_text("You cannot edit this exam because you are not the creator of it.")
         return
-    '''
-    if (validation_check_1(update, exam_name)):
-        return
-    if (validation_check_2(update, exam_name)):
-        return
-    '''
     ch.delete_in_exam(exam_name)
     send_message(bot, update, "You start deleting words from the " + exam_name)
     send_message(bot, update, instructions_for_filling_the_dictionary)
-
-#устаревшая функция
-''' 
-def continue_delete_in_exam(bot, update):
-    global instructions_for_filling_the_dictionary
-    ch = get_chat(update)
-    exam_name = get_text_in_request(update.message.text)
-    die = ch._delete_in_exam
-    if (die.getName() is None):
-        update.message.reply_text("There are no exams from which you delete words")
-        return
-    if (exam_name != ""):
-        update.message.reply_text("You can only delete words from the " + die.getName() + ". Correct: /continue_delete_in_exam")
-        return
-    ch.status = "delete"
-    send_message(bot, update, "you continue to delete from " + die.getName())
-    send_message(bot, update, instructions_for_filling_the_dictionary)
-'''
 
 def delete_exam(bot, update):
     global T
@@ -424,15 +280,9 @@ def delete_exam(bot, update):
     if (not T.exist_in_the_table(exam_name)):
         update.message.reply_text("the " + exam_name + " exam does not exist")
         return
-    if (T.exam_owner_id(exam_name) != ch._chatId):
+    if (T.exam_owner_id(exam_name) != ch._chatId and not ch._admin_mode):
         update.message.reply_text("You cannot edit this exam because you are not the creator of it.")
         return
-    '''
-    if (validation_check_1(update, exam_name)):
-        return
-    if (validation_check_2(update, exam_name)):
-        return
-    '''
     T.remove_exam(exam_name)
     send_message(bot, update, "removed " + exam_name)
 
@@ -487,7 +337,7 @@ def change_name(bot, update):
     if (not T.exist_in_the_table(names[0])):
         update.message.reply_text("the " + names[0] + " exam does not exist")
         return
-    if (T.exam_owner_id(names[0]) != ch._chatId):
+    if (T.exam_owner_id(names[0]) != ch._chatId and not ch._admin_mode):
         update.message.reply_text("You cannot edit this exam because you are not the creator of it.")
         return
     if (exists(update, names[1])): #в случае если такой экзамен уже существует
@@ -495,48 +345,71 @@ def change_name(bot, update):
     T.change_name(names[0], names[1])
     update.message.reply_text("the exam has been renamed from " + names[0] + " to " + names[1])
 
-def help(bot, update): #вывод всех команд
+def commands(bot, update): #вывод всех команд
     send_message(bot, update, '''
-        - /start
-        - /end
-        - /new_exam
-        - /train_exam
-        - - - /next_word  
-        - - - /all_meanings
-        - /exam
-        - - - /repeat_exam
-        - - - /finish
-        - /add_to_exam
-        - /delete_in_exam
-        - /delete_exam
-        - /list_exams
-        - /list_words
-        - /status
-        - /help
-        
+- /start
+- /end
+- /new_exam <exam_name>
+- /train_exam <exam_name>
+- - - /next_word  
+- - - /all_meanings
+- /exam <exam_name>
+- - - /repeat_exam
+- - - /finish
+- /add_to_exam <exam_name>
+- /change_name <name> <new_name>
+- /delete_in_exam <exam_name>
+- /delete_exam <exam_name>
+- /list_exams 
+- /list_words <exam_name>
+- /status
+- /commands
+- /help    
     ''')
+
+
+def help(bot, update):  # вывод всех команд
+    send_message(bot, update, '''
+/start - hello command
+ /end - command ending any mode. (exam creation, training, etc.)
+ /new_exam <exam_name> - command that creates an exam. (starts the creation mode)
+ /train_exam <exam_name> - command that starts the training mode.
+  /next_word - command that gets the word question. (only in training mode)
+  /all_meanings - command that gets answers to the word question. (only in training mode)
+ /exam <exam_name> - command that starts testing. (starts exam mode)
+  /repeat_exam - command that launches a new test in the same exam. (only in exam mode)
+  /finish - command that gets test results prematurely. (only in exam mode)
+ /add_to_exam <exam_name> - command that starts the mode of adding data to the exam.
+ /change_name <old_name> <new_name> - command that allows you to change the name of the exam.
+ /delete_in_exam <exam_name> - command that starts the mode of deleting data from the exam.
+ /delete_exam <exam_name> - command that deletes the exam.
+ /list_exams - displaying a list of all exams from a common base.
+ /list_words <exam_name> - output of all data from the exam.
+ /status - current bot mode.
+ /commands - list of all commands.
+ /help - a list of all commands with a short explanation to them.
+        ''')
 
 def get_message(bot, update): #при получении любой незнакомой функции или любого текста
     ch = get_chat(update)
     client_answer = update.message.text #сообщение от клиента
     if ch.status == "exam": #получаем ответ от клиента. Делаем 1 шаг экзамена.
         ex = ch._current_exam #объект - рассматриваемый экзамен. тип:exam.
-        if ex is None:
-            send_message(bot, update, "Error. You are not in exam")
-            send_message(bot, update, "If you want to finish examining, then call the command /end")
+        if (ex._finish):
+            send_message(bot, update, "You are not taking the test now.")
+            send_message(bot, update, "If you want to pass another test for the " + ex._exam_name + " exam, then call the command  /repeat_exam")
+            send_message(bot, update, "If you want to exit the exam mode, then call the command /end")
             return
         response = ex.addAnswer(client_answer) #проводим шаг экзамена. Получаем следующий вопрос или ответы.
         send_message(bot, update, response)
+        if (ex._finish): send_message(bot, update, "If you want to exit the exam mode, then call the command /end")
     elif ch.status == "create":
         ce = ch._created_exam
-        if not ce: #если всё работает - это не нужно
-            send_message(bot, update, "Error. You are not creating a new exam")
-            return
         ans = client_answer
         ans.replace(" ", "")
         index_separator = ans.find("==")
-        if (index_separator == -1 or index_separator == 0 or index_separator == len(ans) - 1 or ans.find("//") != -1):
-            send_message(bot, update, "Not correct." + instructions_for_filling_the_dictionary)
+        if (index_separator == -1 or index_separator == 0 or index_separator == len(ans) - 1 or ans.find("//") != -1 or ans.find("/=") != -1 or ans.find("=/") != -1 or ans.find("===") != -1):
+            send_message(bot, update, "Not correct. " + instructions_for_filling_the_dictionary)
             send_message(bot, update, "If you want to finish creating an exam, then call the command /end")
             return
         ce.parse_and_add(client_answer)
@@ -544,28 +417,20 @@ def get_message(bot, update): #при получении любой незнак
         ce.reset()
         send_message(bot, update, "added in %s" % ce.getName())
     elif ch.status == "train":
-        #?
         response = "train, do not accept text"
         send_message(bot, update, response)
         send_message(bot, update, "If you want to end the training, then call the command /end")
     elif ch.status == "delete":
         die = ch._delete_in_exam
-        if not die:
-            send_message(bot, update, "Error. You are not deleting word from exam")
-            return
         ans = client_answer
         ans.replace(" ", "")
         index_separator = ans.find("==")
-        if (index_separator == -1 or index_separator == 0 or index_separator == len(ans) - 1 or ans.find("//") != -1):
-            send_message(bot, update, "Not correct." + instructions_for_filling_the_dictionary)
+        if (index_separator == -1 or index_separator == 0 or index_separator == len(ans) - 1 or ans.find("//") != -1 or ans.find("/=") != -1 or ans.find("=/") != -1 or ans.find("===") != -1):
+            send_message(bot, update, "Not correct. " + instructions_for_filling_the_dictionary)
             send_message(bot, update, "If you want to complete the deletion, then call the command /end")
             return
         die.parse_and_delete(client_answer)
         response = T.check_entry_into_the_exam(die.words())
-        if (not response is None):
-            die.reset()
-            send_message(bot, update, "In exam " + response[0] + " there is no " + response[1] + " == " + response[2])
-            return
         T.remove_from_table(die.words())
         die.reset()
         send_message(bot, update, "deleting from %s" % die.getName())
@@ -574,8 +439,8 @@ def get_message(bot, update): #при получении любой незнак
         ans = client_answer
         ans.replace(" ", "")
         index_separator = ans.find("==")
-        if (index_separator == -1 or index_separator == 0 or index_separator == len(ans) - 1 or ans.find("//") != -1):
-            send_message(bot, update, "Not correct." + instructions_for_filling_the_dictionary)
+        if (index_separator == -1 or index_separator == 0 or index_separator == len(ans) - 1 or ans.find("//") != -1 or ans.find("/=") != -1 or ans.find("=/") != -1 or ans.find("===") != -1):
+            send_message(bot, update, "Not correct. " + instructions_for_filling_the_dictionary)
             send_message(bot, update, "If you want to finish adding, then call the command /end")
             return
         ate.parse_and_add(client_answer)
@@ -583,16 +448,32 @@ def get_message(bot, update): #при получении любой незнак
         ate.reset()
         send_message(bot, update, "added in %s" % ate.getName())
     else:
-        response = "Your status is unknown: "
-        if (ch.status is None): response += "None"
-        else: response += ch.status
-        send_message(bot, update, response)
-        send_message(bot, update, "command list: /help")
+        #response = "Your status is unknown: "
+        #if (ch.status is None): response += "None"
+        #else: response += ch.status
+        #send_message(bot, update, response)
+        send_message(bot, update, "Action or command not recognized.")
+        send_message(bot, update, "The bot is waiting for a command. He has no mod now.")
+        send_message(bot, update, "А list of all commands with a short explanation: /help")
 
 def status2(bot, update):
     ch = get_chat(update)
-    if (ch._status is None): send_message(bot, update, "None")
-    else: send_message(bot, update, ch._status)
+    response = ""
+    if (ch._status is None): response += "None"
+    else: response += ch._status
+    if (ch._admin_mode): response += " +admin mode"
+    send_message(bot, update, response)
+
+def admmode(bot, update):
+    ch = get_chat(update)
+    state = get_text_in_request(update.message.text)
+    if (state == "on"):
+        ch._admin_mode = True
+        send_message(bot, update, "Admin mode is included. This mode is not for public use. When working with an object, you get the same rights as its owner.")
+    elif (state == "off"):
+        ch._admin_mode = False
+        send_message(bot, update, "Admin mode is disabled")
+
 
 def error(update, context): #в случае вознекновения ошибки она выводится в logger (здесь в поток вывода)
     """Log Errors caused by update."""
@@ -640,8 +521,11 @@ def parametrs_for_updater(): #каждой команде сопоставляе
     dispatcher.add_handler(CommandHandler('list_exams', list_exams))
     dispatcher.add_handler(CommandHandler('list_words', list_words))
     dispatcher.add_handler(CommandHandler('status', status2))
-    #dispatcher.add_handler(CommandHandler('change_name', change_name))
+    dispatcher.add_handler(CommandHandler('change_name', change_name))
+    dispatcher.add_handler(CommandHandler('commands', commands))
     dispatcher.add_handler(CommandHandler('help', help))
+
+    dispatcher.add_handler(CommandHandler('admmode', admmode))
     
     dispatcher.add_error_handler(error)  #функция, вызываемая в случае ошибки
     

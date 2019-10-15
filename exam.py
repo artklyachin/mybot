@@ -7,7 +7,7 @@ class Exam:
     _client_ans = [] #список ответов клиента при статусе exam
     _question_index = None #количество ответов клиента на экзамене
     _exam_name = None
-    _finish = None #начало экзамена true, конец False
+    _finish = True #начало экзамена true, конец False
 
     def __init__(self, words, exam_name, num_questions):
         self._num_questions = num_questions
@@ -50,10 +50,10 @@ class Exam:
             word1 = self._exam_questions[i]
             client_answer = self._client_ans[i]
             if (client_answer in self._words[word1]):
-                ans += "True "
+                ans += "True! "
             else:
-                ans += "False "
-            ans += " your: " + client_answer + "  right: "
+                ans += "False. "
+            ans += "word: " + word1 + ", your answer: " + client_answer + ",  right: "
             for word2 in self._words[word1]:
                 ans += word2 + " / "
             ans += "\n"

@@ -128,6 +128,14 @@ class Table:
         return list_word1_ans_word2
 
     def change_name(self, old_name, new_name):
+        list_pair = self.list_words(old_name)
+        owner_id = self.exam_owner_id(old_name)
+        rows = list()
+        for el in list_pair:
+            rows.append([new_name, el[0], el[1]])
+        self.remove_exam(old_name)
+        self.add_exam_name(new_name, owner_id)
+        self.insert_into_table(rows)
         return
 
     def exam_owner_id(self, exam_name):
